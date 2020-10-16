@@ -53,6 +53,8 @@ class TwitterAPICaller: BDBOAuth1SessionManager {
             success(response as! [NSDictionary])
         }, failure: { (task: URLSessionDataTask?, error: Error) in
             failure(error)
+            print("failed to receive data from API endpoint")
+            print(error)
         })
     }
 

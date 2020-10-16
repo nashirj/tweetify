@@ -91,6 +91,39 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
             img.clipsToBounds = true
         }
         
+        let origDate = tweetArray[indexPath.row]["created_at"] as! String
+        print("origDate: \(origDate)")
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "eee MMM dd HH:mm:ss ZZZZ yyyy"
+        
+        var timeSinceTweetFormatted: String = ""
+        if let date = dateFormatter.date(from: origDate) {
+            print("date: \(date)")
+            let timeSinceTweet = -date.timeIntervalSinceNow
+            print("timeSinceTweet: \(timeSinceTweet)")
+            if timeSinceTweet < 60 { // seconds
+                timeSinceTweetFormatted = "\(timeSinceTweet)s"
+            } else if timeSinceTweet < 3600 { // minutes
+                timeSinceTweetFormatted = "\(Int((timeSinceTweet / 60).rounded(.down)))m"
+            } else if timeSinceTweet < 86400 { // hours
+                timeSinceTweetFormatted = "\(Int((timeSinceTweet / 3600).rounded(.down)))h"
+            } else if timeSinceTweet < 604800 { // days
+                timeSinceTweetFormatted = "\(Int((timeSinceTweet / 86400).rounded(.down)))d"
+            } else { // short date format: 10/12/20
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateStyle = .short
+                timeSinceTweetFormatted = dateFormatter.string(from: date)
+            }
+        } else {
+            print("failed to parse")
+        }
+        
+        print("time right now: \(Date())")
+
+        cell.dateLabel?.text = "• \(timeSinceTweetFormatted)"
+        
         return cell
     }
     
