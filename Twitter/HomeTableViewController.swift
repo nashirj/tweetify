@@ -31,6 +31,13 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
         tableView.rowHeight = UITableView.automaticDimension
     }
     
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("\n\nviewDidAppear called\n\n")
+    }
+    
+    
     @objc func loadTweets() {
         let url = "https://api.twitter.com/1.1/statuses/home_timeline.json"
         let params: [String : Any] = ["count" : numberOfTweets, "tweet_mode" : "extended"]
@@ -39,7 +46,7 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
             self.tweetArray.removeAll()
             for tweet in tweets {
                 self.tweetArray.append(tweet)
-//                print(tweet["full_text"])
+                print(tweet["full_text"])
             }
             
             self.tableView.reloadData()
@@ -92,7 +99,7 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
         }
         
         let origDate = tweetArray[indexPath.row]["created_at"] as! String
-        print("origDate: \(origDate)")
+//        print("origDate: \(origDate)")
         
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -100,11 +107,11 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
         
         var timeSinceTweetFormatted: String = ""
         if let date = dateFormatter.date(from: origDate) {
-            print("date: \(date)")
+//            print("date: \(date)")
             let timeSinceTweet = -date.timeIntervalSinceNow
-            print("timeSinceTweet: \(timeSinceTweet)")
+//            print("timeSinceTweet: \(timeSinceTweet)")
             if timeSinceTweet < 60 { // seconds
-                timeSinceTweetFormatted = "\(timeSinceTweet)s"
+                timeSinceTweetFormatted = "\(Int(timeSinceTweet.rounded(.down)))s"
             } else if timeSinceTweet < 3600 { // minutes
                 timeSinceTweetFormatted = "\(Int((timeSinceTweet / 60).rounded(.down)))m"
             } else if timeSinceTweet < 86400 { // hours
@@ -112,17 +119,22 @@ class HomeTableViewController: UIViewController, UITableViewDataSource, UITableV
             } else if timeSinceTweet < 604800 { // days
                 timeSinceTweetFormatted = "\(Int((timeSinceTweet / 86400).rounded(.down)))d"
             } else { // short date format: 10/12/20
-                let dateFormatter = DateFormatter()
                 dateFormatter.dateStyle = .short
                 timeSinceTweetFormatted = dateFormatter.string(from: date)
             }
         } else {
-            print("failed to parse")
+//            print("failed to parse")
         }
         
-        print("time right now: \(Date())")
+//        print("time right now: \(Date())")
 
         cell.dateLabel?.text = "• \(timeSinceTweetFormatted)"
+        
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)
+        
+        cell.tweetID = tweetArray[indexPath.row]["id"] as! Int
+        
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
         
         return cell
     }
